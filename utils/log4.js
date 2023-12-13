@@ -35,20 +35,21 @@ log4js.configure({
 
 function loggerType(ctx, type, content) {
   ctx.level = levels[type];
-  ctx[type](content);
+  console.log(content);
+  return ctx[type](content);
 }
 
 exports.debug = (content) => {
   const logger = log4js.getLogger();
-  loggerType(logger, 'debug', content);
+  return loggerType(logger, 'debug', content);
 };
 
 exports.info = (content) => {
   const logger = log4js.getLogger('info');
-  loggerType(logger, 'info', content);
+  return loggerType(logger, 'info', content);
 };
 
 exports.error = (content) => {
   const logger = log4js.getLogger('error');
-  loggerType(logger, 'error', content);
+  return loggerType(logger, 'error', content);
 };

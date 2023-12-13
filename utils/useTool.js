@@ -31,6 +31,11 @@ module.exports = {
   },
 
   success(data = '', msg = '', code = CODE.SUCCESS) {
+    console.log({
+      code,
+      data,
+      msg,
+    });
     info(msg);
     return {
       code,
@@ -38,7 +43,7 @@ module.exports = {
       msg,
     };
   },
-  fail(msg = '', code = CODE.ERROR) {    
+  fail(msg = '', code = CODE.ERROR) {
     error(msg);
     return {
       code,

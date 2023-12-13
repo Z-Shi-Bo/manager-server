@@ -1,13 +1,25 @@
-const router = require('koa-router')()
+/**
+ * 用户管理模块
+ */
+const router = require('koa-router')();
+// 导入数据库集合
+const User = require('../models/userSchema');
+const { success, fail } = require('../utils/useTool');
 
-router.prefix('/users')
+router.prefix('/users');
 
-router.get('/', function (ctx, next) {
-  ctx.body = 'this is a users response!'
-})
+router.post('/login', async (ctx) => {
+  try {
+    const { username, password } = ctx.request.body;
+    const result = await User.findOne({ username, password });
+    if (result) {
+      ctx.body = success(result, '登录成功');
+    } else {
+      ctx.body = fail('用户名或密码错误');
+    }
+  } catch (error) {
+    ctx.body = fail(error.msg);
+  }
+});
 
-router.get('/bar', function (ctx, next) {
-  ctx.body = 'this is a users/bar response'
-})
-
-module.exports = router
+module.exports = router;

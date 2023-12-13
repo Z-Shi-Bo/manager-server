@@ -7,13 +7,16 @@ const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
 const { debug, info, error } = require('./utils/log4');
 
-const index = require('./routes/index');
 const users = require('./routes/users');
 
 // error handler
 onerror(app);
 
+// 导入数据库链接
+require('./config/db');
+
 // middlewares
+
 app.use(
   bodyparser({
     enableTypes: ['json', 'form', 'text'],
@@ -29,17 +32,12 @@ app.use(
   })
 );
 
-// logger
 app.use(async (ctx, next) => {
-  const start = new Date();
+  info(`params: ${JSON.stringify(ctx.request.body || ctx.request.query)}`);
   await next();
-  info('log output');
 });
-
 // routes
-app.use(index.routes(), index.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
-
 // error-handling
 app.on('error', (err, ctx) => {
   error(err);
