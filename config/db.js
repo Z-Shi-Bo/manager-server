@@ -7,7 +7,10 @@ const config = require('./index');
 const { info, error } = require('../utils/log4');
 
 // 建立链接
-mongoose.connect(config.URL);
+mongoose.connect(config.URL, {
+  // user: 'root',
+  // pass: '123456',
+});
 const db = mongoose.connection;
 
 

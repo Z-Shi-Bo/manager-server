@@ -19,15 +19,11 @@ module.exports = {
    * @param {number} pageSize
    */
 
-  pager(pageNum = 1, pageSize = 1) {
+  pager(pageNum = 1, pageSize = 10) {
     pageNum *= 1;
     pageSize *= 1;
     const skipIndex = (pageNum - 1) * pageSize;
-    return {
-      pageNum,
-      pageSize,
-      skipIndex,
-    };
+    return skipIndex;
   },
 
   success(data = '', msg = '', code = CODE.SUCCESS) {

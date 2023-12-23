@@ -6,8 +6,11 @@ const onerror = require('koa-onerror');
 const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
 const { debug, info, error } = require('./utils/log4');
+const koaJwt = require('koa-jwt');
+const { secret } = require('./config');
 
 const users = require('./routes/users');
+const login = require('./routes/login');
 
 // error handler
 onerror(app);
@@ -23,7 +26,6 @@ app.use(
   })
 );
 app.use(json());
-app.use(logger());
 app.use(require('koa-static')(__dirname + '/public'));
 
 app.use(
@@ -31,12 +33,26 @@ app.use(
     extension: 'pug',
   })
 );
-
 app.use(async (ctx, next) => {
   info(`params: ${JSON.stringify(ctx.request.body || ctx.request.query)}`);
-  await next();
+  await next().catch((err) => {
+    console.log(err);
+    if (err.status === 401) {
+      ctx.status = 200;
+      ctx.body = {
+        code: 401,
+        message: 'Token 认证超时',
+      };
+    } else {
+      throw err;
+    }
+  });
 });
+
+app.use(koaJwt({ secret }).unless({ path: [/^\/login/] }));
+
 // routes
+app.use(login.routes(), login.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
 // error-handling
 app.on('error', (err, ctx) => {
