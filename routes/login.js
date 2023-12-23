@@ -15,7 +15,6 @@ router.post('/login', async (ctx) => {
   try {
     const { username, password } = ctx.request.body;
     const result = await User.findOne({ username, password }, 'userId userName userEmail state role depId roleList');
-    console.log(result);
     if (result) {
       const data = result._doc;
       if (data) {

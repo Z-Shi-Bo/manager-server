@@ -36,7 +36,6 @@ app.use(
 app.use(async (ctx, next) => {
   info(`params: ${JSON.stringify(ctx.request.body || ctx.request.query)}`);
   await next().catch((err) => {
-    console.log(err);
     if (err.status === 401) {
       ctx.status = 200;
       ctx.body = {

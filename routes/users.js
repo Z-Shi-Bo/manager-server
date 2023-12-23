@@ -35,8 +35,29 @@ router.get('/list', async (ctx) => {
     const total = await User.countDocuments(params);
     ctx.body = success({ list, total, pageNum, pageSize }, '获取成功');
   } catch (error) {
-    ctx.body = fail(error);
+    ctx.body = fail(`查询异常：${error.stack}`);
   }
 });
+
+// 根据userId数组来修改对应的用户状态为2
+router.post('/delete', async (ctx) => {
+  try {
+    const { userIds } = ctx.request.body;
+    if (!userIds) {
+      ctx.body = fail('请选择要删除的用户');
+      return;
+    }
+    const res = await User.updateMany({ userId: { $in: userIds } }, { state: 2 });
+    if (res.modifiedCount) {
+      ctx.body = success({ code: res.code }, `共删除${res.modifiedCount}条`);
+      return;
+    }
+    ctx.body = fail('删除失败');
+  } catch (error) {
+    ctx.body = fail(`删除异常：${error.stack}`);
+  }
+});
+
+// 
 
 module.exports = router;
