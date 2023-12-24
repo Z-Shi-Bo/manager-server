@@ -29,4 +29,4 @@ const userSchema = mongoose.Schema({
   remark: String, // 未来的扩展字段
 });
 
-module.exports = mongoose.model('users', userSchema);
+module.exports = mongoose.model('user', userSchema, 'users');

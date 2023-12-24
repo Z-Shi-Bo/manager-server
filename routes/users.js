@@ -4,11 +4,13 @@
 const router = require('koa-router')();
 // 导入数据库集合
 const User = require('../models/userSchema');
+const UserId = require('../models/userIdSchema');
 const { success, fail, pager } = require('../utils/useTool');
 // 导入jwt库
 const jwt = require('jsonwebtoken');
 // 加密配置
 const { secret } = require('../config');
+const md5 = require('md5');
 router.prefix('/users');
 
 router.get('/leave/notice', async (ctx) => {
@@ -31,7 +33,7 @@ router.get('/list', async (ctx) => {
     if (userName) params.userName = userName;
     if (state && state - 0 !== 0) params.state = state;
     // 第二个参数可以控制那些字段返回，那些不返回
-    const list = await User.find(params, { _id: 0, password: 0 }).skip(skipIndex).limit(pageSize);
+    const list = await User.find(params, { _id: 0, password: 0 }).skip(skipIndex).limit(pageSize).sort({ userId: 1 });
     const total = await User.countDocuments(params);
     ctx.body = success({ list, total, pageNum, pageSize }, '获取成功');
   } catch (error) {
@@ -58,6 +60,41 @@ router.post('/delete', async (ctx) => {
   }
 });
 
-// 
+// 根据userId,userName,userEmail,mobile,job,state,roleList,deptId字段来新增用户信息
+router.post('/add', async (ctx) => {
+  try {
+    const { userId, userName, userEmail, mobile, job, state, roleList, deptId, role } = ctx.request.body;
+    if (!userName || !userEmail || !deptId) {
+      ctx.body = fail('请填写完整信息');
+      return;
+    }
+    const res = await User.findOne({ $or: [{ userName }, { userEmail }] });
+    if (res) {
+      ctx.body = fail('用户名或邮箱已存在');
+      return;
+    }
+    // 用户id维护在userId表中
+    const doc = await UserId.findOneAndUpdate({ _id: 'userId' }, { $inc: { sequence_value: 1 } }, { new: true });
+    const user = await new User({ userId: doc.sequence_value, userName, userEmail, mobile, job, state, roleList, deptId, role, password: md5('123456') });
+    await user.save();
+    ctx.body = success({}, '新增成功');
+  } catch (error) {
+    ctx.body = fail(`新增异常：${error.stack}`);
+  }
+});
 
+// 根据userId,userName,userEmail,mobile,job,state,roleList,deptId字段来修改用户信息
+router.post('/update', async (ctx) => {
+  try {
+    const { userId, userName, userEmail, mobile, job, state, roleList, deptId, role } = ctx.request.body;
+    if (!userName || !userEmail || !deptId) {
+      ctx.body = fail('请填写完整信息');
+      return;
+    }
+    await User.findOneAndUpdate({ userId }, { mobile, job, state, roleList, deptId, role });
+    ctx.body = success({}, '修改成功');
+  } catch (error) {
+    ctx.body = fail(`修改异常：${error.stack}`);
+  }
+});
 module.exports = router;
