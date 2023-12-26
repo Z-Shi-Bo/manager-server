@@ -3,7 +3,7 @@
  */
 const mongoose = require('mongoose');
 
-const userIdSchema = mongoose.Schema({
+const userIdSchema = new mongoose.Schema({
   _id: String,
   sequence_value: Number,
 });

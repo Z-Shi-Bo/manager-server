@@ -11,6 +11,7 @@ const { secret } = require('./config');
 
 const users = require('./routes/users');
 const login = require('./routes/login');
+const menus = require('./routes/menus');
 
 // error handler
 onerror(app);
@@ -34,7 +35,7 @@ app.use(
   })
 );
 app.use(async (ctx, next) => {
-  info(`params: ${JSON.stringify(ctx.request.body || ctx.request.query)}`);
+  // info(`params: ${JSON.stringify(ctx.request.body || ctx.request.query)}`);
   await next().catch((err) => {
     if (err.status === 401) {
       ctx.status = 200;
@@ -53,6 +54,7 @@ app.use(koaJwt({ secret }).unless({ path: [/^\/login/] }));
 // routes
 app.use(login.routes(), login.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
+app.use(menus.routes(), menus.allowedMethods());
 // error-handling
 app.on('error', (err, ctx) => {
   error(err);
