@@ -12,6 +12,7 @@ const { secret } = require('./config');
 const users = require('./routes/users');
 const login = require('./routes/login');
 const menus = require('./routes/menus');
+const roles = require('./routes/roles');
 
 // error handler
 onerror(app);
@@ -55,6 +56,7 @@ app.use(koaJwt({ secret }).unless({ path: [/^\/login/] }));
 app.use(login.routes(), login.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
 app.use(menus.routes(), menus.allowedMethods());
+app.use(roles.routes(), roles.allowedMethods());
 // error-handling
 app.on('error', (err, ctx) => {
   error(err);
