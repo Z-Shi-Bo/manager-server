@@ -25,10 +25,6 @@ router.get('/list', async (ctx) => {
       (await Role.find({ roleName: { $regex: regex } })
         .skip(skipIndex)
         .limit(pageSize)) || [];
-    list.forEach((item) => {
-      console.log(item);
-      item.permissionList = item.permissionList.checkedKeys;
-    });
     ctx.body = success({ list, total, pageNum, pageSize }, '查询成功');
     return;
   }
@@ -76,6 +72,21 @@ router.post('/delete', async (ctx) => {
       return;
     }
     ctx.body = fail('删除失败');
+  } catch (error) {
+    ctx.body = fail(error);
+  }
+});
+
+// 设置用户权限
+router.post('/setPermission', async (ctx) => {
+  const { _id, permissionList } = ctx.request.body;
+  try {
+    const result = await Role.findByIdAndUpdate(_id, { permissionList });
+    if (result) {
+      ctx.body = success({}, '设置成功');
+      return;
+    }
+    ctx.body = fail('设置失败');
   } catch (error) {
     ctx.body = fail(error);
   }
