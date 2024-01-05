@@ -13,6 +13,7 @@ const users = require('./routes/users');
 const login = require('./routes/login');
 const menus = require('./routes/menus');
 const roles = require('./routes/roles');
+const depts = require('./routes/depts');
 
 // error handler
 onerror(app);
@@ -57,6 +58,7 @@ app.use(login.routes(), login.allowedMethods());
 app.use(users.routes(), users.allowedMethods());
 app.use(menus.routes(), menus.allowedMethods());
 app.use(roles.routes(), roles.allowedMethods());
+app.use(depts.routes(), depts.allowedMethods());
 // error-handling
 app.on('error', (err, ctx) => {
   error(err);
