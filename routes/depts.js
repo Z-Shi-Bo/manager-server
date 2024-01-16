@@ -42,23 +42,21 @@ router.post('/delete', async (ctx) => {
   }
 });
 
-// 根据userId,userName,userEmail,mobile,job,state,roleList,deptId字段来新增用户信息
+// 根据userId,userName,userEmail字段来新增用户信息
 router.post('/add', async (ctx) => {
   try {
-    const { userId, userName, userEmail, mobile, job, state, roleList, deptId, role } = ctx.request.body;
-    if (!userName || !userEmail || !deptId) {
+    const { userId, userName, userEmail, parentId, updateTime, deptName } = ctx.request.body;
+    if (!userName || !userEmail || !deptName) {
       ctx.body = fail('请填写完整信息');
       return;
     }
-    const res = await User.findOne({ $or: [{ userName }, { userEmail }] });
+    const res = await Dept.findOne({ $or: [{ userName }, { userEmail }] });
     if (res) {
       ctx.body = fail('用户名或邮箱已存在');
       return;
     }
-    // 用户id维护在userId表中
-    const doc = await UserId.findOneAndUpdate({ _id: 'userId' }, { $inc: { sequence_value: 1 } }, { new: true });
-    const user = await new User({ userId: doc.sequence_value, userName, userEmail, mobile, job, state, roleList, deptId, role, password: md5('123456') });
-    await user.save();
+    const dept = new Dept({ userId, userName, userEmail, parentId, updateTime, deptName });
+    await dept.save();
     ctx.body = success({}, '新增成功');
   } catch (error) {
     ctx.body = fail(`新增异常：${error.stack}`);
